@@ -1,0 +1,16 @@
+{
+  "name": "recon",
+  "version": "1.0.0",
+  "description": "ReCON — automated reconciliation and transaction transparency for Wema Bank",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test test/engine.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["reconciliation", "nibss", "payments", "wema", "hackaholics"],
+  "license": "MIT"
+}

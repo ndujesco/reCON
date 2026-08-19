@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ReCON — Reconciliation &amp; Transaction Transparency</title>
+    <meta name="description" content="ReCON tracks every Wema transfer across six checkpoints and shows exactly where a customer's money stopped." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%238b5cf6'/%3E%3Cpath d='M9 22V10h6a4 4 0 010 8H9m8 4l-4-4' stroke='%23fff' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">R</div>
+        <div class="brand-text">
+          <strong>ReCON</strong>
+          <span>Reconciliation &amp; Transaction Transparency · Wema Bank</span>
+        </div>
+      </div>
+
+      <nav class="nav" role="tablist">
+        <button class="nav-btn is-active" data-view="reconciliation" role="tab">Reconciliation</button>
+        <button class="nav-btn" data-view="suspense" role="tab">Suspense monitor</button>
+      </nav>
+
+      <div class="topbar-right">
+        <div class="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4-4" /></svg>
+          <input id="search" type="search" placeholder="Search reference, name or bank" autocomplete="off" />
+        </div>
+        <div class="live" title="Live event feed from core banking, NIP gateway and beneficiary banks">
+          <span class="dot"></span> Live
+        </div>
+      </div>
+    </header>
+
+    <section class="kpis" id="kpis" aria-label="Reconciliation health"></section>
+
+    <main class="layout" data-view="reconciliation">
+      <!-- ------------------------------ Queue ------------------------------ -->
+      <section class="panel queue" aria-label="Transaction queue">
+        <div class="panel-head">
+          <h2>Transaction queue</h2>
+          <span class="count" id="queue-count"></span>
+        </div>
+        <div class="filters" id="filters">
+          <button class="chip is-active" data-state="exceptions">Exceptions</button>
+          <button class="chip" data-state="all">All</button>
+          <button class="chip" data-state="IN_FLIGHT">In flight</button>
+          <button class="chip" data-state="RECONCILED">Reconciled</button>
+        </div>
+        <ul class="txn-list" id="txn-list"></ul>
+      </section>
+
+      <!-- ------------------------------ Detail ----------------------------- -->
+      <section class="panel detail" id="detail" aria-label="Transaction detail">
+        <div class="empty">Select a transaction to trace it.</div>
+      </section>
+    </main>
+
+    <!-- --------------------------- Suspense view --------------------------- -->
+    <main class="layout suspense-view" data-view="suspense" hidden>
+      <section class="panel" aria-label="Suspense account monitor">
+        <div class="panel-head">
+          <h2>Suspense account monitor</h2>
+          <span class="count" id="suspense-count"></span>
+        </div>
+        <p class="panel-note">
+          Funds that arrived but were never swept to the beneficiary account. ReCON ages every entry automatically, so
+          stuck money surfaces on its own instead of being found weeks later during manual reconciliation.
+        </p>
+        <div class="table-wrap">
+          <table class="suspense-table">
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Suspense account</th>
+                <th>Beneficiary</th>
+                <th class="num">Amount</th>
+                <th class="num">Age</th>
+                <th>State</th>
+              </tr>
+            </thead>
+            <tbody id="suspense-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

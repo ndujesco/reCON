@@ -1,0 +1,12 @@
+# One-click deploy to Render (free tier). No build step, no dependencies.
+services:
+  - type: web
+    name: recon
+    runtime: node
+    plan: free
+    buildCommand: ""
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
