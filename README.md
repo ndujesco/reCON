@@ -23,9 +23,11 @@ exactly is the customer's money, and what is being done about it?**
 
 | | |
 |---|---|
-| **Live frontend** | _add your deployed URL here_ |
-| **Live backend API** | _same host; the API is served from `/api` (e.g. `https://<your-app>/api/health`)_ |
-| **Recorded demo** | _add your Loom link here_ |
+| **Live application** | <https://re-con-inky.vercel.app/> |
+| **Live backend API** | <https://re-con-inky.vercel.app/api/health> (all routes under `/api`, listed below) |
+| **Recorded demo** | [Watch the walkthrough](https://drive.google.com/file/d/1lHiYdPMB4T6GzCueF8Qe6-CusJ1hZRGL/view?usp=drive_link) |
+| **Repository** | <https://github.com/ndujesco/reCON> |
+| **Contact** | <opeyemikayode16@gmail.com> |
 
 ---
 
@@ -103,7 +105,7 @@ npm test           # 10 tests covering the reconciliation rules
 | `POST` | `/api/tick` | advance the simulated event feed by one step |
 
 ```bash
-curl localhost:4317/api/transactions/WEM-20260818-004417 | jq '.diagnosis'
+curl https://re-con-inky.vercel.app/api/transactions/WEM-20260818-004417 | jq '.diagnosis'
 ```
 
 ## Architecture
@@ -171,4 +173,4 @@ transaction.
 
 ---
 
-Built for **Wema Bank Hackaholics 7.0**.
+Built for **Wema Bank Hackaholics 7.0**. Questions: <opeyemikayode16@gmail.com>
