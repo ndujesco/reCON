@@ -7,8 +7,8 @@ const { reconcile } = require('./engine');
  * Event source + in-memory store.
  *
  * In production this layer is replaced by real feeds: core banking postings,
- * NIP gateway traffic and beneficiary bank callbacks. Everything above it —
- * the reconciliation engine, the API, the dashboard — stays exactly the same,
+ * NIP gateway traffic and beneficiary bank callbacks. Everything above it,
+ * the reconciliation engine, the API, the dashboard, stays exactly the same,
  * because the engine only ever sees normalised events.
  */
 
@@ -92,7 +92,7 @@ function makeTransaction(now, spec) {
         ts: t,
         status: 'FAILED',
         amount: txn.amount,
-        code: spec.failCode || '25 — Unable to locate record',
+        code: spec.failCode || '25: Unable to locate record',
         detail: 'Beneficiary bank rejected the instruction.',
       });
     }
@@ -145,7 +145,7 @@ function codeFor(id) {
     SENT_TO_NIBSS: 'NIP-REQ-00',
     PROCESSED_BY_NIBSS: 'NIP-RTE-00',
     RECEIVED_BY_BANK: 'NIP-ACK-00',
-    CREDITED: '00 — Approved or completed successfully',
+    CREDITED: '00: Approved or completed successfully',
   }[id];
 }
 
@@ -171,7 +171,7 @@ class Store {
     const now = Date.now();
 
     // ---- The hero case the demo turns on ---------------------------------
-    // ₦250,000 debited, routed, acknowledged by the beneficiary bank — and
+    // ₦250,000 debited, routed, acknowledged by the beneficiary bank, and
     // then nothing. Today this customer is told "wait 24–48 hours".
     const hero = makeTransaction(now, {
       amount: 25_000_000,
@@ -257,7 +257,7 @@ class Store {
       suspenseCount: suspense.length,
       suspenseValue: suspense.reduce((s, t) => s + t.suspense.amount, 0),
       reconciledPct: all.length ? Math.round((by('RECONCILED') / all.length) * 100) : 0,
-      // Every transaction is located by replaying its events — measured, not claimed.
+      // Every transaction is located by replaying its events: measured, not claimed.
       avgLocateMs: this.measureLocateTime(),
     };
   }

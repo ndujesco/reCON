@@ -1,6 +1,6 @@
 'use strict';
 
-/* ReCON dashboard — talks to the reconciliation API and renders the trail. */
+/* ReCON dashboard: talks to the reconciliation API and renders the trail. */
 
 const $ = (sel) => document.querySelector(sel);
 const api = (path) => fetch(path).then((r) => r.json());
@@ -20,7 +20,7 @@ function ago(ms) {
   if (ms < 60_000) return `${Math.max(1, Math.round(ms / 1000))}s`;
   if (ms < 3_600_000) return `${Math.round(ms / 60_000)}m`;
   const hours = ms / 3_600_000;
-  // Support staff think in hours, not days — a stuck transfer is "26h", not "1.1d".
+  // Support staff think in hours, not days: a stuck transfer is "26h", not "1.1d".
   if (hours < 10) return `${hours.toFixed(1)}h`;
   if (hours < 72) return `${Math.round(hours)}h`;
   return `${(ms / 86_400_000).toFixed(1)}d`;
@@ -131,12 +131,12 @@ function supportView(t) {
         c.state === 'CONFIRMED'
           ? `<div class="hop-evidence"><span class="src">${c.sourceSystem}</span> · ${c.evidence.eventId} · ${c.evidence.code}</div>`
           : isBreak
-            ? `<div class="hop-missing">No event received from ${c.sourceSystem} — the chain breaks here.</div>`
+            ? `<div class="hop-missing">No event received from ${c.sourceSystem}. The chain breaks here.</div>`
             : `<div class="hop-evidence">Awaiting ${c.sourceSystem}</div>`;
       return `<li class="hop ${cls}">
         <span class="hop-node">${c.state === 'CONFIRMED' ? tick : isBreak ? cross : ''}</span>
         <span><span class="hop-label">${c.label}</span>${body}</span>
-        <span class="hop-time">${c.at ? clock(c.at) : '—'}</span>
+        <span class="hop-time">${c.at ? clock(c.at) : '–'}</span>
       </li>`;
     })
     .join('');
@@ -164,17 +164,17 @@ function supportView(t) {
         <td class="mono">${clock(e.ts)}</td>
         <td>${e.source}</td>
         <td>${e.checkpoint}</td>
-        <td class="mono">${e.code || '—'}</td>
-        <td class="num">${e.amount || '—'}</td>
+        <td class="mono">${e.code || '–'}</td>
+        <td class="num">${e.amount || '–'}</td>
       </tr>`,
     )
     .join('');
 
   return `<div class="detail-body">
       ${diagnosis}
-      <div class="section-label">Checkpoint trail — every hop proven by a source event</div>
+      <div class="section-label">Checkpoint trail: every hop proven by a source event</div>
       <ul class="rail">${rail}</ul>
-      <div class="section-label">Raw evidence log — ${t.events.length} normalised events</div>
+      <div class="section-label">Raw evidence log: ${t.events.length} normalised events</div>
       <div class="table-wrap">
         <table>
           <thead><tr><th class="mono">Time</th><th>Source system</th><th>Checkpoint</th><th class="mono">Code</th><th class="num">Amount</th></tr></thead>
@@ -206,7 +206,7 @@ function customerView(t) {
 
   return `<div class="detail-body">
       <div class="customer">
-        <div class="phone-note">Exactly what the customer sees in the Wema app — the same trail, no internal system detail.</div>
+        <div class="phone-note">Exactly what the customer sees in the Wema app: the same trail, no internal system detail.</div>
         <div class="cust-message">
           <div class="k">Status of your ${t.amountFormatted.replace('.00', '')} transfer</div>
           <p>${t.diagnosis.customerMessage}</p>

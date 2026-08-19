@@ -101,7 +101,7 @@ test('a downstream rejection is attributed, not left as pending', () => {
       ts: NOW - 90 * MIN,
       status: 'FAILED',
       amount: 25_000_000,
-      code: '25 — Unable to locate record',
+      code: '25: Unable to locate record',
     },
   ];
   const r = reconcile(txn(), events, NOW);

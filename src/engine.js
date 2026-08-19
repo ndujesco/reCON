@@ -8,7 +8,7 @@ const NGN = (kobo) =>
 /**
  * Reconciliation engine.
  *
- * Input:  the raw, normalised event stream for ONE transaction reference —
+ * Input:  the raw, normalised event stream for ONE transaction reference:
  *         events pulled from core banking, the NIP gateway, beneficiary bank
  *         responses and the suspense ledger.
  * Output: an evidence-backed view of where the money actually is, what broke,
@@ -216,7 +216,7 @@ function diagnose({ state, breakpoint, anomalies, suspense, reversal, txn }) {
     PROCESSED_BY_NIBSS: {
       headline: 'Sitting at the NIBSS rail',
       cause: 'NIBSS acknowledged receipt but has not routed the instruction to the beneficiary bank.',
-      action: 'Raise a NIP trace with the session ID. Do not resend — the instruction is live.',
+      action: 'Raise a NIP trace with the session ID. Do not resend; the instruction is live.',
       customer: 'Your transfer has left Wema and is with the payment network. It has not yet reached the receiving bank.',
     },
     RECEIVED_BY_BANK: {
