@@ -20,6 +20,8 @@
 
       <nav class="nav" role="tablist">
         <button class="nav-btn is-active" data-view="reconciliation" role="tab">Reconciliation</button>
+        <button class="nav-btn" data-view="sources" role="tab">Data sources</button>
+        <button class="nav-btn" data-view="validation" role="tab">Validation</button>
         <button class="nav-btn" data-view="suspense" role="tab">Suspense monitor</button>
       </nav>
 
@@ -28,6 +30,7 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4-4" /></svg>
           <input id="search" type="search" placeholder="Search reference, name or bank" autocomplete="off" />
         </div>
+        <div class="rail-pill" title="This build reconciles the NIP rail. ATM, remittance, cheque and card settlement are out of scope for this phase.">NIP rail</div>
         <div class="live" title="Live event feed from core banking, NIP gateway and beneficiary banks">
           <span class="dot"></span> Live
         </div>
@@ -55,6 +58,105 @@
       <!-- ------------------------------ Detail ----------------------------- -->
       <section class="panel detail" id="detail" aria-label="Transaction detail">
         <div class="empty">Select a transaction to trace it.</div>
+      </section>
+    </main>
+
+    <!-- -------------------------- Data sources view ------------------------- -->
+    <main class="layout stack-view" data-view="sources" hidden>
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Connected data sources</h2>
+          <span class="count" id="sources-count"></span>
+        </div>
+        <p class="panel-note">
+          Both feeds are pulled on a schedule from systems Wema already runs. Nothing is uploaded, nothing is
+          exported to a spreadsheet, and there is no separate portal to sign into: the data is already inside the
+          bank, it has simply never been joined up.
+        </p>
+        <div class="source-grid" id="source-grid"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Data shape</h2>
+          <span class="count" id="shape-count"></span>
+        </div>
+        <p class="panel-note">
+          Reconciliation works on structured records: a reference, an amount, an account, a value date. Records that
+          arrive as free text are never quietly guessed at. They are flagged, matched on amount, account and value
+          date where that is possible, and held for a human to confirm.
+        </p>
+        <div class="shape-grid" id="shape-grid"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Record explorer</h2>
+          <span class="count" id="records-count"></span>
+        </div>
+        <p class="panel-note">
+          A transfer, the fee on it, the VAT on that fee and the levy are four separate postings against one
+          instruction. Classifying them before matching is what stops a fee break from reading as a missing transfer.
+        </p>
+        <div class="query-bar">
+          <input id="record-query" type="search" placeholder="Query records: category:TAX  ·  bank:gtbank  ·  unstructured:true  ·  min:10000" autocomplete="off" />
+        </div>
+        <div class="filters" id="record-filters"></div>
+        <div class="table-wrap">
+          <table class="records-table">
+            <thead>
+              <tr>
+                <th>Record</th>
+                <th>Category</th>
+                <th>Reference</th>
+                <th>Narration</th>
+                <th>Source</th>
+                <th class="num">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="records-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- --------------------------- Validation view -------------------------- -->
+    <main class="layout stack-view" data-view="validation" hidden>
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Settlement match</h2>
+          <span class="count" id="match-count"></span>
+        </div>
+        <p class="panel-note">
+          Wema's own postings, matched line by line against the NIBSS NIP settlement report for the session. A
+          reference matches exactly. A record with no reference is matched on amount, account and value date, and is
+          proposed rather than booked.
+        </p>
+        <div class="match-grid" id="match-grid"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Validation findings</h2>
+          <span class="count" id="findings-count"></span>
+        </div>
+        <p class="panel-note">
+          Duplicates, one-sided records, amounts the two sides disagree on, and general ledger balances that did not
+          carry forward. Ranked worst first, each one naming the records it is drawn from.
+        </p>
+        <ul class="findings" id="findings-list"></ul>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>General ledger continuity</h2>
+          <span class="count" id="balance-count"></span>
+        </div>
+        <p class="panel-note">
+          Yesterday's closing balance has to equal today's opening balance. Where it does not, money moved without a
+          posting to explain it, and the difference is the amount to go looking for.
+        </p>
+        <div class="balance-grid" id="balance-grid"></div>
       </section>
     </main>
 

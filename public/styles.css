@@ -767,3 +767,398 @@ tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
 ::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-thumb { background: #232b3b; border-radius: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
+
+/* ============================ Data sources ============================== */
+.rail-pill {
+  font: 600 10.5px/1 system-ui;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #c4b5fd;
+  padding: 6px 10px;
+  border-radius: 7px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  white-space: nowrap;
+}
+
+/* The stacked views scroll as one column rather than the two-pane split. */
+.layout.stack-view {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  padding: 14px 16px 24px;
+}
+.layout.stack-view .panel {
+  flex: 0 0 auto;
+  padding-bottom: 15px;
+}
+
+.source-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  padding: 0 15px;
+}
+.source-card {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: var(--panel-2);
+  padding: 14px 15px;
+}
+.source-card.is-scope {
+  border-color: rgba(139, 92, 246, 0.3);
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.09), rgba(139, 92, 246, 0.01));
+}
+.source-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+.source-name {
+  font: 600 14px/1.3 system-ui;
+}
+.source-status {
+  margin-left: auto;
+  font: 600 10px/1 system-ui;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ok);
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(45, 212, 167, 0.12);
+}
+.source-kind {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 9px;
+}
+.source-detail {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #c9d1e0;
+}
+.source-stats {
+  display: flex;
+  gap: 18px;
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line-soft);
+}
+.source-stats .k {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.source-stats .v {
+  display: block;
+  font-size: 13px;
+  margin-top: 3px;
+  font-variant-numeric: tabular-nums;
+}
+.scope-out {
+  margin: 10px 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+/* ------------------------------ Data shape ------------------------------ */
+.shape-grid {
+  padding: 0 15px;
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(320px, 1.4fr);
+  gap: 22px;
+  align-items: start;
+}
+.split-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--panel-2);
+}
+.seg-ok { background: var(--ok); }
+.seg-warn { background: var(--warn); }
+.split-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 13px;
+  font-size: 12.5px;
+  color: #c9d1e0;
+}
+.sw {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  margin-right: 8px;
+}
+.sw-ok { background: var(--ok); }
+.sw-warn { background: var(--warn); }
+
+.cat-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cat-row {
+  display: grid;
+  grid-template-columns: 92px 1fr 44px 110px;
+  gap: 11px;
+  align-items: center;
+}
+.cat-track {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--panel-2);
+  overflow: hidden;
+}
+.cat-track i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--accent-deep), var(--accent));
+}
+.cat-count {
+  font: 600 12px/1 system-ui;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.cat-value {
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cat-chip {
+  display: inline-block;
+  font: 600 10px/1 system-ui;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.cat-transfer { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; }
+.cat-fee { background: rgba(139, 92, 246, 0.16); color: #c4b5fd; }
+.cat-tax { background: rgba(245, 166, 35, 0.15); color: #ffca7a; }
+.cat-reversal { background: rgba(124, 135, 155, 0.18); color: #b3bccd; }
+.cat-settlement { background: rgba(45, 212, 167, 0.14); color: #6ee7c0; }
+.cat-unclassified { background: rgba(242, 85, 90, 0.16); color: #ff9ea2; }
+
+/* --------------------------- Record explorer ---------------------------- */
+.query-bar {
+  padding: 0 15px 10px;
+}
+.query-bar input {
+  width: 100%;
+  height: 38px;
+  padding: 0 13px;
+  border-radius: 9px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font: 400 13px/1 var(--mono);
+  outline: none;
+}
+.query-bar input:focus {
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+}
+.query-bar input::placeholder {
+  color: var(--faint);
+  font-family: var(--mono);
+}
+.chip b {
+  font-weight: 600;
+  color: var(--faint);
+  margin-left: 3px;
+}
+.chip.is-active b { color: inherit; }
+
+.records-table .narration {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  max-width: 260px;
+}
+.row-loose td { background: rgba(245, 166, 35, 0.045); }
+.flag {
+  font: 600 10px/1 system-ui;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #ffca7a;
+  padding: 3px 7px;
+  border-radius: 5px;
+  background: rgba(245, 166, 35, 0.15);
+}
+.empty-row {
+  text-align: center;
+  color: var(--faint);
+  padding: 26px 0;
+}
+.was {
+  font-size: 10.5px;
+  color: #ffca7a;
+  margin-left: 8px;
+}
+
+/* ============================== Validation ============================== */
+.match-grid,
+.balance-grid {
+  padding: 0 15px;
+}
+.match-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.match-tiles .kpi {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: var(--panel-2);
+  padding: 13px 14px;
+}
+
+.findings {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 15px;
+}
+.finding {
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--grey);
+  border-radius: 10px;
+  background: var(--panel-2);
+  padding: 13px 15px;
+}
+.finding.sev-CRITICAL { border-left-color: var(--bad); }
+.finding.sev-HIGH { border-left-color: var(--warn); }
+.finding.sev-MEDIUM { border-left-color: var(--flight); }
+.finding-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 7px;
+}
+.finding-head code {
+  font: 600 10px/1.6 var(--mono);
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: rgba(242, 85, 90, 0.16);
+  color: #ff9ea2;
+  white-space: nowrap;
+}
+.sev-HIGH .finding-head code { background: rgba(245, 166, 35, 0.16); color: #ffca7a; }
+.sev-MEDIUM .finding-head code { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; }
+.finding-title {
+  font: 600 13.5px/1.3 system-ui;
+}
+.finding-amount {
+  margin-left: auto;
+  font: 600 14px/1 system-ui;
+  font-variant-numeric: tabular-nums;
+}
+.finding-detail {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #c9d1e0;
+}
+.finding-foot {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.finding-action b {
+  color: var(--faint);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-size: 10px;
+  margin-right: 5px;
+}
+.finding-records {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+/* -------------------------- Ledger continuity --------------------------- */
+.balance-grid {
+  display: grid;
+  /* The carried-forward column is the whole point of this table, so the cards
+     are sized to fit all six columns rather than letting it scroll out of view. */
+  grid-template-columns: repeat(auto-fit, minmax(620px, 1fr));
+  gap: 12px;
+}
+.balance-card td:first-child,
+.balance-card th:first-child {
+  white-space: nowrap;
+}
+.balance-card td,
+.balance-card th {
+  padding: 7px 10px;
+}
+.balance-card .table-wrap { overflow-x: auto; }
+.balance-card {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: var(--panel-2);
+  padding: 13px 14px;
+}
+.balance-card.has-break { border-color: rgba(242, 85, 90, 0.4); }
+.balance-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 11px;
+}
+.balance-name { font: 600 13.5px/1 system-ui; }
+.balance-code { font-size: 11px; color: var(--faint); }
+.balance-flag,
+.balance-ok {
+  margin-left: auto;
+  font: 600 10px/1 system-ui;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.balance-flag { background: rgba(242, 85, 90, 0.16); color: #ff9ea2; }
+.balance-ok { background: rgba(45, 212, 167, 0.12); color: var(--ok); }
+.balance-note {
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #ff9ea2;
+}
+.gap { color: #ff9ea2; }
+.tickmark { color: var(--faint); font-size: 11px; }
+
+/* `.layout.stack-view` outranks the plain `.layout[hidden]` rule above, so the
+   hidden state has to be restated at matching specificity or every view paints
+   at once. */
+.layout.stack-view[hidden],
+.layout.suspense-view[hidden] {
+  display: none;
+}

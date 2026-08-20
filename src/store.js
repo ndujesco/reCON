@@ -2,6 +2,9 @@
 
 const { ORDER } = require('./checkpoints');
 const { reconcile } = require('./engine');
+const { buildLedger } = require('./ledger');
+const { validate, sourceSummary } = require('./validation');
+const { CATEGORIES, byId: categoryById } = require('./classify');
 
 /**
  * Event source + in-memory store.
@@ -160,6 +163,21 @@ function detailFor(id, txn) {
   }[id];
 }
 
+/**
+ * Splits a query bar string into `field:value` terms plus leftover free text.
+ * `category:tax bank:gtbank 250000` becomes two terms and one text fragment.
+ */
+function parseQuery(q) {
+  const terms = [];
+  const text = [];
+  for (const token of String(q).trim().split(/\s+/).filter(Boolean)) {
+    const m = token.match(/^([a-z]+):(.+)$/i);
+    if (m) terms.push([m[1].toLowerCase(), m[2]]);
+    else text.push(token);
+  }
+  return { terms, text: text.join(' ') };
+}
+
 class Store {
   constructor() {
     this.transactions = new Map(); // reference -> { txn, events }
@@ -225,7 +243,106 @@ class Store {
 
   add(entry) {
     this.transactions.set(entry.txn.reference, entry);
+    this.ledgerCache = null; // the pools are derived from the transaction set
     return entry;
+  }
+
+  /**
+   * The two ingested data pools, derived once and reused until the feed moves.
+   * Core banking postings and the NIP settlement report are both pulled, never
+   * uploaded, which is why nothing in ReCON asks anyone to log in or import.
+   */
+  ledger() {
+    if (!this.ledgerCache) this.ledgerCache = buildLedger(this.all());
+    return this.ledgerCache;
+  }
+
+  /** Memoised alongside the pools: `stats()` runs on every push to the live
+   *  feed, and re-validating the whole book each time is wasted work. */
+  validation() {
+    const ledger = this.ledger();
+    if (!this.validationCache || this.validationFor !== ledger) {
+      this.validationCache = validate(ledger);
+      this.validationFor = ledger;
+    }
+    return this.validationCache;
+  }
+
+  sources() {
+    return sourceSummary(this.ledger());
+  }
+
+  /**
+   * The record explorer behind the query bar.
+   *
+   * Supports plain text plus `field:value` terms, so the desk can ask for
+   * `category:tax bank:gtbank unstructured:true` without leaving the page.
+   */
+  records({ q = '', category = null, structured = null, limit = 120 } = {}) {
+    const ledger = this.ledger();
+    const all = [
+      ...ledger.core,
+      ...ledger.settlement.map((line) => ({
+        recordId: line.settlementId,
+        reference: line.reference,
+        source: 'NIP_SETTLEMENT_REPORT',
+        valueDate: line.valueDate,
+        account: line.beneficiaryAccount,
+        counterparty: `${line.beneficiaryBank} · session ${line.sessionId}`,
+        narration: `NIP NET SETTLEMENT ${line.reference} RC ${line.responseCode}`,
+        postingCode: 'STL-NIP-NET',
+        amount: line.amount,
+        drcr: 'CR',
+        structured: true,
+        category: 'SETTLEMENT',
+        classification: { confidence: 1, basis: 'NIP settlement report line' },
+      })),
+    ];
+
+    const { terms, text } = parseQuery(q);
+    let list = all;
+
+    if (category && category !== 'all') list = list.filter((r) => r.category === category);
+    if (structured === true) list = list.filter((r) => r.structured);
+    if (structured === false) list = list.filter((r) => !r.structured);
+
+    for (const [field, value] of terms) {
+      const v = value.toLowerCase();
+      if (field === 'category') list = list.filter((r) => r.category.toLowerCase().includes(v));
+      else if (field === 'source') list = list.filter((r) => r.source.toLowerCase().includes(v));
+      else if (field === 'ref') list = list.filter((r) => (r.reference || '').toLowerCase().includes(v));
+      else if (field === 'bank') list = list.filter((r) => (r.counterparty || '').toLowerCase().includes(v));
+      else if (field === 'unstructured') list = list.filter((r) => r.structured !== (v === 'true'));
+      else if (field === 'min') list = list.filter((r) => r.amount >= Number(v) * 100);
+      else if (field === 'max') list = list.filter((r) => r.amount <= Number(v) * 100);
+    }
+
+    if (text) {
+      const t = text.toLowerCase();
+      list = list.filter(
+        (r) =>
+          (r.reference || '').toLowerCase().includes(t) ||
+          (r.narration || '').toLowerCase().includes(t) ||
+          (r.counterparty || '').toLowerCase().includes(t) ||
+          (r.postingCode || '').toLowerCase().includes(t) ||
+          r.recordId.toLowerCase().includes(t),
+      );
+    }
+
+    list = [...list].sort((a, b) => b.valueDate - a.valueDate);
+
+    return {
+      count: list.length,
+      totalValue: list.reduce((s, r) => s + r.amount, 0),
+      categories: CATEGORIES.map((c) => ({
+        id: c.id,
+        label: c.label,
+        short: c.short,
+        description: c.description,
+        count: all.filter((r) => r.category === c.id).length,
+      })),
+      records: list.slice(0, limit).map((r) => ({ ...r, categoryLabel: categoryById[r.category].short })),
+    };
   }
 
   get(reference) {
@@ -257,6 +374,9 @@ class Store {
       suspenseCount: suspense.length,
       suspenseValue: suspense.reduce((s, t) => s + t.suspense.amount, 0),
       reconciledPct: all.length ? Math.round((by('RECONCILED') / all.length) * 100) : 0,
+      // Whole-book validation, alongside the per-transfer view.
+      validation: this.validation().summary,
+      matchRate: this.validation().match.totals.matchRate,
       // Every transaction is located by replaying its events: measured, not claimed.
       avgLocateMs: this.measureLocateTime(),
     };
@@ -323,7 +443,10 @@ class Store {
       changed.push(txn.reference);
     }
 
-    if (rand() < 0.55) {
+    // The feed keeps moving, but the book does not grow without bound: past a
+    // ceiling, ticks only advance transactions already in flight. A demo that
+    // silently triples its own dataset makes every figure on screen unreadable.
+    if (this.transactions.size < 95 && rand() < 0.55) {
       const entry = makeTransaction(now, {
         amount: between(5, 180) * 100_000,
         ageMs: between(1_000, 8_000),
@@ -334,7 +457,10 @@ class Store {
       changed.push(entry.txn.reference);
     }
 
-    if (changed.length) this.emit({ type: 'tick', changed });
+    if (changed.length) {
+      this.ledgerCache = null;
+      this.emit({ type: 'tick', changed });
+    }
     return changed;
   }
 

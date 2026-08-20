@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Store } = require('./src/store');
 const { CHECKPOINTS } = require('./src/checkpoints');
+const { CATEGORIES } = require('./src/classify');
 
 const PORT = process.env.PORT || 4317;
 const PUBLIC = path.join(__dirname, 'public');
@@ -58,6 +59,74 @@ const routes = {
   },
 
   'GET /api/suspense': (req, res) => json(res, { entries: store.suspenseLedger() }),
+
+  'GET /api/categories': (req, res) => json(res, CATEGORIES),
+
+  // Where the data comes from, how much of it arrives matchable, and what is
+  // in scope. Both feeds are pulled: there is nothing here to log into.
+  'GET /api/sources': (req, res) => json(res, store.sources()),
+
+  // The whole-book view: duplicates, one-sided records, amount disagreements
+  // and general ledger breaks, ranked worst first.
+  'GET /api/validation': (req, res) => {
+    const { findings, summary } = store.validation();
+    json(res, { summary, findings });
+  },
+
+  // Core banking postings matched line by line against the NIP settlement report.
+  'GET /api/settlement': (req, res) => {
+    const { match } = store.validation();
+    json(res, {
+      totals: match.totals,
+      probable: match.probable.map((p) => ({
+        recordId: p.record.recordId,
+        narration: p.record.narration,
+        amount: p.record.amount,
+        valueDate: p.record.valueDate,
+        settlementId: p.line.settlementId,
+        confidence: p.confidence,
+        basis: p.basis,
+        proposes: p.proposes,
+      })),
+      mismatched: match.mismatched.map((m) => ({
+        reference: m.record.reference,
+        coreAmount: m.record.amount,
+        nipAmount: m.line.amount,
+        delta: m.delta,
+      })),
+      unmatchedInNip: match.unmatchedInNip.map((r) => ({
+        recordId: r.recordId,
+        reference: r.reference,
+        narration: r.narration,
+        amount: r.amount,
+      })),
+      unmatchedInCore: match.unmatchedInCore.map((l) => ({
+        settlementId: l.settlementId,
+        reference: l.reference,
+        sessionId: l.sessionId,
+        amount: l.amount,
+        beneficiaryBank: l.beneficiaryBank,
+      })),
+    });
+  },
+
+  // General ledger continuity: does each closing balance carry forward?
+  'GET /api/balances': (req, res) => json(res, { accounts: store.ledger().balances }),
+
+  // The record explorer. Accepts free text plus `field:value` terms, so the
+  // desk can ask a real question without anyone writing SQL for them.
+  'GET /api/records': (req, res, url) => {
+    const structuredParam = url.searchParams.get('structured');
+    json(
+      res,
+      store.records({
+        q: url.searchParams.get('q') || '',
+        category: url.searchParams.get('category'),
+        structured: structuredParam == null ? null : structuredParam === 'true',
+        limit: Number(url.searchParams.get('limit') || 120),
+      }),
+    );
+  },
 
   'POST /api/tick': (req, res) => json(res, { changed: store.tick() }),
 };
