@@ -1,10 +1,10 @@
 # ReCON — Automated Reconciliation & Transaction Transparency
 
 ## Team Members
+- **Opeyemi Kayode** — Team Lead
 - Umeozor Chukwuzubelu Benedict
 - Ndujekwu Ugochukwu Peter
-- *(to be added)*
-- *(to be added)*
+- Ayomide Rasaq
 
 ---
 
