@@ -1,41 +1,108 @@
-# ReCON
+# ReCON — Automated Reconciliation & Transaction Transparency
 
-**Automated reconciliation and transaction transparency for Wema Bank.**
+## Team Members
+- Umeozor Chukwuzubelu Benedict
+- Ndujekwu Ugochukwu Peter
+- *(to be added)*
+- *(to be added)*
 
-When a Nigerian interbank transfer fails, the customer is told to wait 24–48 hours, not because the
-problem is hard, but because nobody can see *where* the money stopped. The debit is in core banking,
-the routing is in the NIBSS gateway, the acknowledgement is in the beneficiary bank's response, and
-nothing joins them up.
+---
 
-ReCON joins them up. It does two things at once:
+## 🚀 Live Demo
 
-- **Down one transaction:** it tracks every transfer across **six checkpoints**, matches the events each
-  system produces against a single reference, and computes the transaction's true state.
-- **Across the whole book:** it matches Wema's own core banking postings against the **NIBSS NIP
-  settlement report**, line by line, and reports everything that does not agree — duplicates, one-sided
-  records, amounts the two sides disagree on, and general ledger balances that did not carry forward.
+*   **Live Application:** <https://re-con-inky.vercel.app/>
+*   **Backend API:** <https://re-con-inky.vercel.app/api/health> — all routes under `/api`, listed below
+*   **Recorded Demo:** <https://drive.google.com/drive/folders/1gec3LqSLzwYB-R94BVmGS4D0OEUyE5zl?usp=sharing>
 
-So support staff and customers both get a straight answer:
+---
+
+## 🎯 The Problem
+
+> **How might we** show a customer and the staff serving them exactly where a delayed or failed
+> interbank transfer has stopped, and what is being done about it, instead of asking them to wait
+> 24 to 48 hours for an answer nobody can currently give?
+
+Digital payments are now most of how Nigeria moves money: NIBSS processed almost **11 billion instant
+payment transactions in 2024**, up from about 5 billion in 2022. At that volume, even a small failure
+rate is an enormous number of people. Between October 2023 and September 2024 the CBN handled
+**19,988 complaints** against financial institutions and helped customers recover about **₦7.05 billion**.
+
+The real problem is not that transfers occasionally fail. It is that when one does, **nobody can see
+where it stopped.** The debit sits in core banking. The routing sits in the NIBSS gateway. The
+acknowledgement sits in the beneficiary bank's response. The money may be sitting in a suspense
+account. Each system holds one true fact, and nothing joins them up, so the honest answer the bank can
+give today is "please wait 24 to 48 hours."
+
+What the customer actually wants to know is simple: *Did the money leave my bank? Did the receiving
+bank get it? Why has the receiver not been credited? Is anyone working on it?*
+
+## ✨ Our Solution
+
+**ReCON** is an automated reconciliation and transaction transparency layer that sits between Wema's
+own core banking records and the NIBSS NIP data, and joins them up. It does two things at once.
+
+**Down one transaction.** Every transfer is tracked across **six checkpoints**, from the customer's
+debit to the beneficiary's credit. ReCON matches the events each system produces against a single
+reference and derives the transaction's true state — it never trusts a stored status field, because a
+transfer stuck inside someone else's system has no status to read, only a missing event. The break
+point is the first checkpoint that should have fired and didn't, which turns an unexplained "pending"
+into a specific, evidence-backed statement about where the money is:
 
 > *"Your account was successfully debited and the transfer reached the receiving bank, but the
 > receiver has not been credited yet. Reconciliation is in progress."*
 
-At its core, ReCON answers one question: **when something goes wrong with a transaction, where
-exactly is the customer's money, and what is being done about it?**
+**Across the whole book.** ReCON matches Wema's core banking postings against the **NIBSS NIP
+settlement report**, line by line, and reports everything that does not agree: the same instruction
+booked twice, records that exist on one side and not the other, amounts the two sides disagree on, and
+general ledger balances that did not carry forward. Every finding names the records that prove it and
+what to do next.
+
+Both data feeds are **pulled automatically** from systems the bank already runs, so there is no login,
+no import screen and no spreadsheet to export. This build deliberately covers **one rail, the NIP
+instant payment rail**, reconciled properly, rather than four rails badly.
 
 ---
 
-## Submission links
+## 🛠️ Tech Stack
 
-| | |
-|---|---|
-| **Live application** | <https://re-con-inky.vercel.app/> |
-| **Live backend API** | <https://re-con-inky.vercel.app/api/health> (all routes under `/api`, listed below) |
-| **Recorded demo** | **⚠️ REPLACE THIS LINK** — upload `demo/out/recon-demo.mp4` (3:12, silent, 1080p) and paste the share link here. The [previous 59-second cut](https://drive.google.com/file/d/1lHiYdPMB4T6GzCueF8Qe6-CusJ1hZRGL/view?usp=drive_link) is out of date and has audio. |
-| **Repository** | <https://github.com/ndujesco/reCON> |
-| **Contact** | <opeyemikayode16@gmail.com> |
+*   **Frontend:** Vanilla HTML, CSS and JavaScript, with server-sent events for the live feed. No framework, no build step.
+*   **Backend:** Node.js using the built-in `http` module. **Zero runtime dependencies.**
+*   **Database:** In-memory, deterministically seeded, so every run reconciles the same book. The store is one module (`src/store.js`); swapping it for real feeds changes nothing above it.
+*   **Deployment:** Vercel (frontend and API together). `PORT` is respected, so the same command runs on Render, Railway, Fly or any Node host.
+*   **AI/APIs:** None. The reconciliation is deterministic by design — a bank needs an answer it can audit and reproduce, not one it has to trust.
+*   **Testing:** `node:test`, 32 tests.
 
 ---
+
+## ⚙️ How to Set Up and Run Locally
+
+Node 18 or later. There are no dependencies to install and nothing to configure.
+
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/Wema-Hackaholics-Hackathon/wema-hackaholics7-0-hackathon-yabatech-project-recon.git
+    ```
+2.  Navigate to the project directory:
+    ```bash
+    cd wema-hackaholics7-0-hackathon-yabatech-project-recon
+    ```
+3.  Start it:
+    ```bash
+    npm start          # http://localhost:4317
+    ```
+4.  Run the tests:
+    ```bash
+    npm test           # 32 tests covering reconciliation, matching, validation and the query engine
+    ```
+
+No `.env` file is needed. `PORT` is the only variable read, and it defaults to `4317`.
+
+---
+
+# Technical detail
+
+Everything below is the detail behind the summary above: the model, the checks, the API and the
+architecture.
 
 ## The six checkpoints
 
@@ -176,17 +243,6 @@ Four views, no login on any of them.
 Throughout: a **live feed** over server-sent events, where new transfers originate and in-flight ones
 advance.
 
-## Running it
-
-Node 18+. No dependencies, no build step.
-
-```bash
-npm start          # http://localhost:4317
-npm test           # 32 tests: the reconciliation rules, matching, validation and the query engine
-```
-
-`PORT` is respected, so the same command works on Render, Railway, Fly or any Node host.
-
 ## API
 
 | Method | Route | Returns |
@@ -287,15 +343,6 @@ of well-understood cases such as known suspense-account sweeps.
 **Success metrics.** Time to identify where a transaction is stuck (minutes, not hours); share of
 failed transfers reconciled without manual log review; reduction in repeat complaints for the same
 transaction.
-
----
-
-## Team
-
-- **Umeozor Chukwuzubelu Benedict**
-- **Ndujekwu Ugochukwu Peter**
-- *(to be added)*
-- *(to be added)*
 
 ---
 
