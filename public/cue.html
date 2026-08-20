@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex, nofollow" />
+<title>ReCON Demo Cue Sheet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" />
+<style>
+  /* Neutrals carry a violet bias lifted from the app itself, so the cue sheet
+     reads as part of the same kit rather than a generic document. */
+  :root {
+    --ground: #faf9fb;
+    --surface: #ffffff;
+    --surface-2: #f3f1f7;
+    --ink: #17151f;
+    --muted: #6a6478;
+    --faint: #948da3;
+    --rule: #e6e2ed;
+    --accent: #6d28d9;
+    --accent-soft: rgba(109, 40, 217, 0.09);
+    --hot: #b45309;
+    --on-accent: #ffffff;
+    --shadow: 0 1px 2px rgba(23, 21, 31, 0.05), 0 8px 24px rgba(23, 21, 31, 0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0a0d14;
+      --surface: #111520;
+      --surface-2: #171c29;
+      --ink: #e8ecf4;
+      --muted: #8b95a9;
+      --faint: #5d6779;
+      --rule: #1e2532;
+      --accent: #a78bfa;
+      --accent-soft: rgba(167, 139, 250, 0.13);
+      --hot: #f5a623;
+      --on-accent: #0a0d14;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0a0d14;
+    --surface: #111520;
+    --surface-2: #171c29;
+    --ink: #e8ecf4;
+    --muted: #8b95a9;
+    --faint: #5d6779;
+    --rule: #1e2532;
+    --accent: #a78bfa;
+    --accent-soft: rgba(167, 139, 250, 0.13);
+    --hot: #f5a623;
+    --on-accent: #0a0d14;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 5rem;
+  }
+
+  /* ------------------------------- Header ------------------------------- */
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--ground) 92%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--rule);
+    padding: 0.85rem max(1rem, env(safe-area-inset-left)) 0.85rem max(1rem, env(safe-area-inset-left));
+  }
+  .bar {
+    max-width: 46rem; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap;
+  }
+  .title { font-size: 0.95rem; font-weight: 600; letter-spacing: -0.01em; }
+  .title small {
+    display: block; margin-top: 1px;
+    font: 400 0.72rem/1.3 "IBM Plex Mono", ui-monospace, monospace;
+    color: var(--muted);
+  }
+  .timer {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 0.55rem;
+  }
+  .elapsed {
+    font: 600 1.05rem/1 "IBM Plex Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    min-width: 3.4rem; text-align: right;
+  }
+  .elapsed.running { color: var(--accent); }
+  button {
+    font: 600 0.8rem/1 "IBM Plex Sans", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 0.55rem 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  button:hover { background: var(--surface-2); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  button.primary:hover { filter: brightness(1.08); }
+  .track { width: 100%; height: 2px; background: var(--rule); margin-top: 0.8rem; }
+  .track i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.25s linear; }
+
+  /* -------------------------------- Body -------------------------------- */
+  main { max-width: 46rem; margin: 0 auto; padding: 0 max(1rem, env(safe-area-inset-left)); }
+
+  .intro {
+    padding: 1.6rem 0 0.4rem;
+    color: var(--muted);
+    font-size: 0.92rem; line-height: 1.65;
+    max-width: 38rem;
+  }
+  .intro strong { color: var(--ink); font-weight: 600; }
+
+  .act {
+    display: flex; align-items: center; gap: 0.9rem;
+    margin: 2.4rem 0 1rem;
+    font: 600 0.7rem/1 "IBM Plex Sans", system-ui, sans-serif;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .act::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+
+  .beat {
+    display: grid;
+    grid-template-columns: 4.2rem 1fr;
+    gap: 1.1rem;
+    padding: 1.1rem 1.2rem 1.15rem;
+    margin-bottom: 0.6rem;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s;
+  }
+  .beat.done { opacity: 0.42; }
+  .beat.now {
+    border-color: var(--accent);
+    box-shadow: var(--shadow), 0 0 0 3px var(--accent-soft);
+    opacity: 1;
+  }
+
+  .rail { display: flex; flex-direction: column; gap: 0.35rem; }
+  .stamp {
+    font: 600 0.95rem/1 "IBM Plex Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .beat.now .stamp { color: var(--accent); }
+  /* The bar is each beat's length against the longest one: how much room you
+     actually have, not decoration. */
+  .dur { height: 3px; background: var(--rule); border-radius: 2px; }
+  .dur i { display: block; height: 100%; background: var(--faint); border-radius: 2px; }
+  .beat.now .dur i { background: var(--accent); }
+  .len {
+    font: 400 0.7rem/1 "IBM Plex Mono", ui-monospace, monospace;
+    color: var(--faint);
+  }
+
+  .cue {
+    font-size: 0.78rem; font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  /* The spoken line gets its own typeface: on a phone, at a glance, the serif
+     is unmistakably "the words you say" and everything else is direction. */
+  .line {
+    margin: 0;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.19rem; line-height: 1.5;
+    letter-spacing: -0.003em;
+    text-wrap: pretty;
+  }
+  .note {
+    margin: 0.75rem 0 0;
+    padding-left: 0.8rem;
+    border-left: 2px solid var(--accent);
+    font-size: 0.85rem; line-height: 1.55;
+    color: var(--muted);
+  }
+  .meta {
+    display: flex; gap: 0.9rem;
+    margin-top: 0.7rem;
+    font: 400 0.72rem/1 "IBM Plex Mono", ui-monospace, monospace;
+    color: var(--faint);
+  }
+  .meta .hot { color: var(--hot); }
+
+  /* ------------------------------- Closing ------------------------------ */
+  .closing {
+    margin: 2.6rem 0 0;
+    padding: 1.3rem 1.4rem;
+    background: var(--surface-2);
+    border-radius: 12px;
+  }
+  .closing h3 {
+    margin: 0 0 0.8rem;
+    font: 600 0.7rem/1 "IBM Plex Sans", system-ui, sans-serif;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .closing ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.6rem; }
+  .closing li { font-size: 0.9rem; line-height: 1.6; color: var(--ink); }
+  .closing strong { font-weight: 600; }
+
+  @media (max-width: 34rem) {
+    .beat { grid-template-columns: 1fr; gap: 0.7rem; padding: 1rem 1.05rem; }
+    .rail { flex-direction: row; align-items: center; gap: 0.6rem; }
+    .dur { flex: 1; }
+    .line { font-size: 1.13rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="title">
+      ReCON demo cue sheet
+      <small>3:12 silent video · 18 beats · 508 words</small>
+    </div>
+    <div class="timer">
+      <span class="elapsed" id="elapsed">0:00</span>
+      <button class="primary" id="start">Start</button>
+      <button id="reset">Reset</button>
+    </div>
+  </div>
+  <div class="track"><i id="track"></i></div>
+</header>
+
+<main>
+  <p class="intro">
+    The video has no sound. Play it, press <strong>Start</strong> at the same moment, and this sheet follows it —
+    the current beat lifts, the ones behind you fade. If you drift, the label in the video's
+    <strong>bottom-left corner</strong> is the real cue: find the beat whose grey line matches it and carry on
+    from there. None of this has to be word for word.
+  </p>
+
+  <h2 class="act" id="act-0"><span>The problem</span></h2>
+
+<article class="beat" data-start="1.5" data-end="10.5" id="beat-0">
+  <div class="rail">
+    <div class="stamp">0:02</div>
+    <div class="dur"><i style="width:75%"></i></div>
+    <div class="len">9s</div>
+  </div>
+  <div class="content">
+    <div class="cue">ReCON · reconciliation and transaction transparency</div>
+    <p class="line">This is ReCON. It reconciles every Wema transfer against the payment rail, and tracks it across six checkpoints: from the customer’s debit to the beneficiary’s credit.</p>
+    <p class="note">This is the intro. Do not add one in front of it.</p>
+    <div class="meta">
+      <span>26 words</span>
+      <span class="">173 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="10.5" data-end="20.5" id="beat-1">
+  <div class="rail">
+    <div class="stamp">0:11</div>
+    <div class="dur"><i style="width:83%"></i></div>
+    <div class="len">10s</div>
+  </div>
+  <div class="content">
+    <div class="cue">Today the answer is “please wait 24 to 48 hours”</div>
+    <p class="line">Today, when a transfer sticks, the customer is told to wait twenty four to forty eight hours. Not because it’s hard. Because nobody can see where the money stopped.</p>
+    <p class="note">Slow down on “nobody can see where the money stopped.” It is the whole problem in one line.</p>
+    <div class="meta">
+      <span>29 words</span>
+      <span class="">174 wpm</span>
+    </div>
+  </div>
+</article>
+<h2 class="act" id="act-2"><span>The solution</span></h2>
+
+<article class="beat" data-start="20.5" data-end="32.5" id="beat-2">
+  <div class="rail">
+    <div class="stamp">0:21</div>
+    <div class="dur"><i style="width:100%"></i></div>
+    <div class="len">12s</div>
+  </div>
+  <div class="content">
+    <div class="cue">Two feeds, pulled automatically. No login, no upload</div>
+    <p class="line">ReCON pulls two feeds automatically: Wema’s own core banking postings, and NIBSS, including the NIP settlement report. No spreadsheet to export. No separate portal to log into. This data is already inside the bank.</p>
+    
+    <div class="meta">
+      <span>34 words</span>
+      <span class="">170 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="32.5" data-end="42.5" id="beat-3">
+  <div class="rail">
+    <div class="stamp">0:33</div>
+    <div class="dur"><i style="width:83%"></i></div>
+    <div class="len">10s</div>
+  </div>
+  <div class="content">
+    <div class="cue">One rail, reconciled properly: NIP</div>
+    <p class="line">And we’re doing one rail properly rather than four badly. This is NIP, instant payments. ATM and remittance come later, as a new feed, not a new product.</p>
+    <p class="note">Say this like a decision, not an apology. Judges respect scoped work.</p>
+    <div class="meta">
+      <span>28 words</span>
+      <span class="">168 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="42.5" data-end="53.5" id="beat-4">
+  <div class="rail">
+    <div class="stamp">0:43</div>
+    <div class="dur"><i style="width:92%"></i></div>
+    <div class="len">11s</div>
+  </div>
+  <div class="content">
+    <div class="cue">Structured data matches. Free text gets flagged, never guessed</div>
+    <p class="line">Reconciliation needs structured data: a reference, an amount, an account, a date. Real bank data isn’t always tidy. When a record is just free text, ReCON flags it. It never guesses.</p>
+    
+    <div class="meta">
+      <span>31 words</span>
+      <span class="">169 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="53.5" data-end="65.5" id="beat-5">
+  <div class="rail">
+    <div class="stamp">0:54</div>
+    <div class="dur"><i style="width:100%"></i></div>
+    <div class="len">12s</div>
+  </div>
+  <div class="content">
+    <div class="cue">Every record classified before anything is matched</div>
+    <p class="line">It also classifies before it matches. One transfer creates four postings: the transfer, the fee, the VAT, and the levy. Reconcile that as one pile, and a fee break looks like a missing transfer.</p>
+    
+    <div class="meta">
+      <span>34 words</span>
+      <span class="">170 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="65.5" data-end="75.5" id="beat-6">
+  <div class="rail">
+    <div class="stamp">1:06</div>
+    <div class="dur"><i style="width:83%"></i></div>
+    <div class="len">10s</div>
+  </div>
+  <div class="content">
+    <div class="cue">Ask the book a question, in plain terms</div>
+    <p class="line">And you can just ask. Here: every record that arrived with no reference. Exactly the ones that need a human to label them, pulled out in one line.</p>
+    <p class="note">Let them watch you type it. The point is that it is this easy.</p>
+    <div class="meta">
+      <span>28 words</span>
+      <span class="">168 wpm</span>
+    </div>
+  </div>
+</article>
+<h2 class="act" id="act-7"><span>The solution in action</span></h2>
+
+<article class="beat" data-start="75.5" data-end="86.5" id="beat-7">
+  <div class="rail">
+    <div class="stamp">1:16</div>
+    <div class="dur"><i style="width:92%"></i></div>
+    <div class="len">11s</div>
+  </div>
+  <div class="content">
+    <div class="cue">Wema’s books against the NIP settlement report, line by line</div>
+    <p class="line">Now the reconciliation. Wema’s books against the NIBSS settlement report, line by line. Not a percentage on a slide. Five numbers, and every one of them opens.</p>
+    
+    <div class="meta">
+      <span>27 words</span>
+      <span class="">147 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="86.5" data-end="98.5" id="beat-8">
+  <div class="rail">
+    <div class="stamp">1:27</div>
+    <div class="dur"><i style="width:100%"></i></div>
+    <div class="len">12s</div>
+  </div>
+  <div class="content">
+    <div class="cue">Records with no reference, matched on amount, account and date</div>
+    <p class="line">The records with no reference aren’t abandoned. ReCON matches them on amount, account and date, and proposes the reference and the label. Proposes. A probable match booked as certain is worse than none.</p>
+    
+    <div class="meta">
+      <span>33 words</span>
+      <span class="">165 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="98.5" data-end="110.5" id="beat-9">
+  <div class="rail">
+    <div class="stamp">1:39</div>
+    <div class="dur"><i style="width:100%"></i></div>
+    <div class="len">12s</div>
+  </div>
+  <div class="content">
+    <div class="cue">Duplicates, one-sided records, amounts that disagree</div>
+    <p class="line">Everything that doesn’t reconcile becomes a finding, worst first. A posting booked twice, so the customer paid twice. Money the rail settled that Wema never booked. Amounts the two sides disagree on.</p>
+    
+    <div class="meta">
+      <span>32 words</span>
+      <span class="">160 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="110.5" data-end="122.5" id="beat-10">
+  <div class="rail">
+    <div class="stamp">1:51</div>
+    <div class="dur"><i style="width:100%"></i></div>
+    <div class="len">12s</div>
+  </div>
+  <div class="content">
+    <div class="cue">A closing balance that did not carry forward</div>
+    <p class="line">And it checks the ledger rolls forward. This suspense account closed at one figure and opened at another. Two hundred and fifty thousand naira, with nothing posted to explain it. Remember that number.</p>
+    <p class="note">Pause after “Remember that number.” Let it hang.</p>
+    <div class="meta">
+      <span>33 words</span>
+      <span class="">165 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="122.5" data-end="130.5" id="beat-11">
+  <div class="rail">
+    <div class="stamp">2:03</div>
+    <div class="dur"><i style="width:67%"></i></div>
+    <div class="len">8s</div>
+  </div>
+  <div class="content">
+    <div class="cue">The exception queue, ranked by money at risk</div>
+    <p class="line">Because a ledger break is somebody’s actual transfer. Here’s the exception queue, ranked by money at risk.</p>
+    
+    <div class="meta">
+      <span>17 words</span>
+      <span class="">128 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="130.5" data-end="138.5" id="beat-12">
+  <div class="rail">
+    <div class="stamp">2:11</div>
+    <div class="dur"><i style="width:67%"></i></div>
+    <div class="len">8s</div>
+  </div>
+  <div class="content">
+    <div class="cue">₦250,000, stuck for 26 hours</div>
+    <p class="line">Top of the list. Two hundred and fifty thousand naira. The same amount. Stuck for twenty six hours.</p>
+    <p class="note">The same ₦250,000 from the ledger break. Make the link explicit if the room looks lost.</p>
+    <div class="meta">
+      <span>18 words</span>
+      <span class="">135 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="138.5" data-end="149.5" id="beat-13">
+  <div class="rail">
+    <div class="stamp">2:19</div>
+    <div class="dur"><i style="width:92%"></i></div>
+    <div class="len">11s</div>
+  </div>
+  <div class="content">
+    <div class="cue">Six checkpoints. The chain breaks at the last one</div>
+    <p class="line">One click, and here’s the whole trail. Debited. Sent to NIBSS. Processed. Received by the beneficiary bank. Then the chain breaks. The money arrived, and the receiver was never credited.</p>
+    <p class="note">Read the checkpoints as a list, a beat on each. Land “then the chain breaks” flat, then stop.</p>
+    <div class="meta">
+      <span>30 words</span>
+      <span class="">164 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="149.5" data-end="161.5" id="beat-14">
+  <div class="rail">
+    <div class="stamp">2:30</div>
+    <div class="dur"><i style="width:100%"></i></div>
+    <div class="len">12s</div>
+  </div>
+  <div class="content">
+    <div class="cue">Every hop proven by the raw event behind it</div>
+    <p class="line">Every hop is proven by the raw event behind it. ReCON names the break, the likely cause, and who owns it, so the escalation goes to the right bank with the evidence attached.</p>
+    
+    <div class="meta">
+      <span>33 words</span>
+      <span class="">165 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="161.5" data-end="172.5" id="beat-15">
+  <div class="rail">
+    <div class="stamp">2:42</div>
+    <div class="dur"><i style="width:92%"></i></div>
+    <div class="len">11s</div>
+  </div>
+  <div class="content">
+    <div class="cue">The same trail, in the customer’s own words</div>
+    <p class="line">And the customer gets the same trail, in their own words. Not “please wait”. Instead: your money reached the receiving bank, the receiver hasn’t been credited, and here’s what’s being done.</p>
+    <p class="note">Slight lift on “your money reached the receiving bank.” This is what the product sells.</p>
+    <div class="meta">
+      <span>31 words</span>
+      <span class="">169 wpm</span>
+    </div>
+  </div>
+</article>
+
+<article class="beat" data-start="172.5" data-end="180.5" id="beat-16">
+  <div class="rail">
+    <div class="stamp">2:53</div>
+    <div class="dur"><i style="width:67%"></i></div>
+    <div class="len">8s</div>
+  </div>
+  <div class="content">
+    <div class="cue">Suspense funds aged automatically</div>
+    <p class="line">Funds sitting in suspense are aged automatically, so stuck money surfaces on its own instead of being found weeks later.</p>
+    
+    <div class="meta">
+      <span>20 words</span>
+      <span class="">150 wpm</span>
+    </div>
+  </div>
+</article>
+<h2 class="act" id="act-17"><span>Close</span></h2>
+
+<article class="beat" data-start="180.5" data-end="189.5" id="beat-17">
+  <div class="rail">
+    <div class="stamp">3:01</div>
+    <div class="dur"><i style="width:75%"></i></div>
+    <div class="len">9s</div>
+  </div>
+  <div class="content">
+    <div class="cue">Where exactly is the money? Answered in milliseconds</div>
+    <p class="line">So: where exactly is the customer’s money, and what’s being done about it? Today, a day or two. ReCON answers in under a millisecond.</p>
+    <p class="note">Stop here. Do not add a thank-you paragraph.</p>
+    <div class="meta">
+      <span>24 words</span>
+      <span class="">160 wpm</span>
+    </div>
+  </div>
+</article>
+
+  <div class="closing">
+    <h3>Before you go on</h3>
+    <ul>
+      <li><strong>Do not pitch.</strong> Four minutes, and the brief is explicit: the problem, what you built, and it working. No deck, no company intro.</li>
+      <li><strong>The ₦250,000 appears twice on purpose.</strong> Once as an unexplained gap in the ledger, then as a real customer's transfer. Same money, found two ways. That is the turn of the demo.</li>
+      <li><strong>Drop the jargon if the room is not technical.</strong> "The payment network" beats "the rail"; "the receiving bank" beats "the beneficiary institution".</li>
+      <li><strong>The video runs 3:12</strong>, leaving about 0:49 for questions. Do not spend it on an intro.</li>
+    </ul>
+  </div>
+</main>
+
+<script>
+  const beats = [...document.querySelectorAll('.beat')];
+  const elapsedEl = document.getElementById('elapsed');
+  const trackEl = document.getElementById('track');
+  const startBtn = document.getElementById('start');
+  const runtime = 191.5;
+
+  let t0 = null;
+  let raf = null;
+
+  const fmt = (s) => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+
+  function paint(now) {
+    elapsedEl.textContent = fmt(now);
+    trackEl.style.width = Math.min(100, (now / runtime) * 100) + '%';
+
+    let current = null;
+    for (const b of beats) {
+      const start = parseFloat(b.dataset.start);
+      const end = parseFloat(b.dataset.end);
+      const isNow = now >= start && now < end;
+      b.classList.toggle('now', isNow);
+      b.classList.toggle('done', now >= end);
+      if (isNow) current = b;
+    }
+
+    // Keep the live beat in view, but never yank the page while the presenter
+    // is scrolling ahead to read what is coming.
+    if (current && current !== paint.last) {
+      paint.last = current;
+      const box = current.getBoundingClientRect();
+      if (box.top < 90 || box.bottom > window.innerHeight - 20) {
+        current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }
+
+  function tick() {
+    paint((Date.now() - t0) / 1000);
+    raf = requestAnimationFrame(tick);
+  }
+
+  function stop() {
+    cancelAnimationFrame(raf);
+    raf = null;
+    elapsedEl.classList.remove('running');
+    startBtn.textContent = 'Start';
+  }
+
+  startBtn.addEventListener('click', () => {
+    if (raf) return stop();
+    t0 = Date.now();
+    elapsedEl.classList.add('running');
+    startBtn.textContent = 'Pause';
+    tick();
+  });
+
+  document.getElementById('reset').addEventListener('click', () => {
+    stop();
+    paint.last = null;
+    elapsedEl.textContent = '0:00';
+    trackEl.style.width = '0';
+    beats.forEach((b) => b.classList.remove('now', 'done'));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // Space bar starts and pauses, so the sheet can be driven without looking.
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && e.target === document.body) {
+      e.preventDefault();
+      startBtn.click();
+    }
+  });
+</script>
+</body>
+</html>
